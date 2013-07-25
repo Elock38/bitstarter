@@ -1,10 +1,25 @@
 var express = require('express');
 var fs = require('fs');
-var app = express.createServer(express.logger());
+var app = express();
 
-app.get('/', function(request, response) {
+var users = function(user, pass){
+    if (user === 'snakes' && pass === 'inthegrass') {
+	return true;
+    }
+    else {
+	return false;
+    }
+}
+
+app.use(express.basicAuth(function(user, pass) {
+    var validUser = users(user, pass);
+    if (validUser) { return true }
+    else { return false } 
+}));    
+
+app.get('/', function(req, res) {
     var buffer = new Buffer(fs.readFileSync('index.html', 'utf-8'));
-    response.send(buffer.toString());
+    res.send(buffer.toString());
 });
 
 var port = process.env.PORT || 8080;
